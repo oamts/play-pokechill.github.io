@@ -97,33 +97,14 @@ function givePkmn(poke, level) {
                 poke.movepool.push(learntMove);
             }
 
-            // Comprobar si ya está equipado en algún slot
-            const equippedSlots = Object.values(poke.moves);
-            const isEquipped = equippedSlots.some(v => v === learntMove);
-
-            // Si no está equipado, asignarlo al primer slot libre entre 2-4
-            if (!isEquipped) {
-                if (poke.moves.slot2 == null) poke.moves.slot2 = learntMove;
-                else if (poke.moves.slot3 == null) poke.moves.slot3 = learntMove;
-                else if (poke.moves.slot4 == null) poke.moves.slot4 = learntMove;
-                // si todos los slots 2-4 están ocupados, no sobrescribimos
-            }
-
-            // Añadir a newMoves solo si no está ya
-            if (!poke.newMoves.includes(learntMove)) {
-                poke.newMoves.push(learntMove);
-            }
         }
     }
 
     // Equipar slot1 con el último movimiento del movepool sólo si no está ya equipado
     const lastMove = poke.movepool[poke.movepool.length - 1];
     if (lastMove) {
-        const equipped = Object.values(poke.moves);
-        if (!equipped.some(v => v === lastMove)) {
-            poke.moves.slot1 = lastMove;
-        }
-        // si lastMove ya está en otro slot, no lo ponemos en slot1 para evitar duplicados
+    poke.moves.slot1 = lastMove;
+        
     }
 
     poke.level = finalLevel;
@@ -2233,12 +2214,22 @@ function exploreCombatPlayer() {
     if (moveTimerPlayer != move[nextMovePlayer]?.timer) moveTimerPlayer = move[nextMovePlayer]?.timer; 
     if (barPlayer != document.getElementById(`pkmn-movebox-slot${exploreCombatPlayerTurn}-team-${exploreActiveMember}-bar`)) barPlayer = document.getElementById(`pkmn-movebox-slot${exploreCombatPlayerTurn}-team-${exploreActiveMember}-bar`);
 
-    //end of move rotation
-    if (!nextMovePlayer) {
+    //rotation reset
+    if (exploreCombatPlayerTurn >= 5){
         exploreCombatPlayerTurn = 1;
         requestAnimationFrame(exploreCombatPlayer)
         return;
     }
+
+    // if it finds an undefined move
+    if (!nextMovePlayer) {
+        exploreCombatPlayerTurn++;
+        requestAnimationFrame(exploreCombatPlayer)
+        return;
+    }
+
+
+
 
     //override battle timer (debug)
     if (saved.overrideBattleTimer != defaultPlayerMoveTimer && moveTimerPlayer != saved.overrideBattleTimer) moveTimerPlayer = saved.overrideBattleTimer
@@ -2280,7 +2271,6 @@ function exploreCombatPlayer() {
         barProgressPlayer = 0
         if (afkSeconds <= 0) voidAnimation(`pkmn-movebox-slot${exploreCombatPlayerTurn}-team-${exploreActiveMember}`, "moveboxFire 1 0.3s");
         exploreCombatPlayerTurn++;
-        if (exploreCombatPlayerTurn >= 5) exploreCombatPlayerTurn = 1;
         barPlayer.style.width = `0%`;
 
         //on move execution
