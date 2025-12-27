@@ -795,6 +795,7 @@ function leaveCombat(){
 function rejoinArea(){
 
 
+    if (saved.currentArea == saved.lastAreaJoined) return
     afkSeconds = 0
     saved.currentArea = saved.lastAreaJoined
 
