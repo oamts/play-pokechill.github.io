@@ -2409,7 +2409,7 @@ function exploreCombatPlayer() {
         if (move[nextMovePlayer].split == 'physical') {
             totalPower = 
             ( movePower + Math.max(0, ( (attacker.bst.atk * 30) * Math.pow(1.1, attacker.ivs.atk) ) - (defender.bst.def * 30) )  )
-            * ( 1+(pkmn[ team[exploreActiveMember].pkmn.id ].level * 0.1) )        
+            * ( 1+(attacker.level * 0.1) )        
             * 1;
         }
 
@@ -2650,7 +2650,7 @@ function exploreCombatPlayer() {
 
 
 
-        if (pkmn[ team[exploreActiveMember].pkmn.id ]?.shiny==true) totalPower *= 1.15
+        if (attacker.shiny==true) totalPower *= 1.15
 
 
         wildPkmnHp -= totalPower;
@@ -2666,9 +2666,9 @@ function exploreCombatPlayer() {
         let dotDamage = 50
         if (areas[saved.currentArea]?.trainer || saved.currentArea == areas.frontierSpiralingTower.id) dotDamage = 12
 
-        if (team[exploreActiveMember].buffs?.burn>0 && !testAbility(`active`, ability.flareBoost.id)) {pkmn[ team[exploreActiveMember].pkmn.id ].playerHp -=  pkmn[ team[exploreActiveMember].pkmn.id ].playerHpMax/dotDamage;}
-        if (team[exploreActiveMember].buffs?.poisoned>0  && !testAbility(`active`, ability.toxicBoost.id)) {pkmn[ team[exploreActiveMember].pkmn.id ].playerHp -=  pkmn[ team[exploreActiveMember].pkmn.id ].playerHpMax/dotDamage;}
-        if (team[exploreActiveMember].item == item.lifeOrb.id) {pkmn[ team[exploreActiveMember].pkmn.id ].playerHp -=  pkmn[ team[exploreActiveMember].pkmn.id ].playerHpMax/10;}
+        if (team[exploreActiveMember].buffs?.burn>0 && !testAbility(`active`, ability.flareBoost.id)) {attacker.playerHp -=  attacker.playerHpMax/dotDamage;}
+        if (team[exploreActiveMember].buffs?.poisoned>0  && !testAbility(`active`, ability.toxicBoost.id)) {attacker.playerHp -=  attacker.playerHpMax/dotDamage;}
+        if (team[exploreActiveMember].item == item.lifeOrb.id) {attacker.playerHp -=  attacker.playerHpMax/10;}
 
         }
 
@@ -5824,6 +5824,7 @@ document.getElementById("genetics-data-sdef").innerHTML = `${(  ivChance*100  ).
 document.getElementById("genetics-data-spe").innerHTML = `${(  ivChance*100  ).toFixed(0)}%`
 
 if (mod==="start"){
+    afkSecondsGenetics = 0
     saved.geneticOperation = timeNeeded
     saved.geneticOperationTotal = timeNeeded
 }
@@ -5957,9 +5958,10 @@ if (mod==="end"){
 setInterval(() => {
     if (saved.geneticOperation==undefined) return
     if (saved.geneticOperation===1)  {saved.geneticOperation--; setGeneticMenu();}
-    if (saved.geneticOperation<=0) return
+    if (saved.geneticOperation==0) return
+    if (saved.geneticOperation<0) saved.geneticOperation=1
     //if (document.visibilityState === "visible") saved.geneticOperation--
-    if (afkSecondsGenetics>0){
+    if (saved.geneticOperation>1 && afkSecondsGenetics>0){
         saved.geneticOperation -= afkSecondsGenetics
         afkSecondsGenetics = 0
     }
