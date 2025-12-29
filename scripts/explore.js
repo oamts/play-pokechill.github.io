@@ -5633,7 +5633,7 @@ let geneticItemSelect = false
 
     document.getElementById("genetics-start").addEventListener("click", e => {
 
-        if (saved.geneticOperation <= 0){
+        if (saved.geneticOperation <= 1){
             
             
 
@@ -5848,7 +5848,7 @@ if (saved.geneticOperation !== undefined){
     if (document.getElementById("genetics-host")) document.getElementById("genetics-host").style.animation = "none"
 }
 
-if (saved.geneticOperation <= 0){
+if (saved.geneticOperation <= 1){
     document.getElementById("genetics-start").textContent = "Finish"
     document.getElementById("genetics-start").style.color = "lawngreen"
     document.getElementById("genetics-start").style.outlineColor = "lawngreen"
