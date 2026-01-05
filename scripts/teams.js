@@ -264,7 +264,10 @@ function injectPreviewTeam(){
     for ( const slot in team){
     team[slot].pkmn = pkmn[currentTeam[slot].pkmn]
     team[slot].item = currentTeam[slot].item
+
+
     }
+
 
 
 
@@ -300,6 +303,7 @@ function setPkmnTeamHp(){
 
     let hpMultiplier = 10
     if (areas[saved.currentArea].trainer || saved.currentArea == areas.frontierSpiralingTower.id) hpMultiplier = 4
+    if (saved.currentArea == areas.training.id) hpMultiplier = 80 //100
 
     pkmn[team[i].pkmn.id].playerHp =
     (100 + ( (pkmn[team[i].pkmn.id].bst.hp * 30) * Math.pow(1.1, pkmn[team[i].pkmn.id].ivs.hp) )
