@@ -62,7 +62,7 @@ function updateGameVersion() {
     item.bottleCap.got += bottlecapGot
     item.goldenBottleCap.got += parseInt((bottlecapGot/3).toFixed(0))
     document.getElementById("tooltipTitle").innerHTML = `New items!`
-    document.getElementById("tooltipTop").style.display = "none"    
+    document.getElementById("tooltipTop").style.display = "none"
     document.getElementById("tooltipMid").innerHTML = `Due to the vs rewards update you have been rewarded for your defeated trainers:`
     document.getElementById("tooltipBottom").innerHTML = `x${bottlecapGot} Bottle Caps | x${(bottlecapGot/3).toFixed(0)} Golden Bottle Caps`
     openTooltip()
@@ -103,12 +103,12 @@ function updateGameVersion() {
   saved.previewTeams.preview30 = {}
 
   for (const i in saved.previewTeams) {
-    saved.previewTeams[i].slot1 = { } 
-    saved.previewTeams[i].slot2 = { } 
-    saved.previewTeams[i].slot3 = { } 
-    saved.previewTeams[i].slot4 = { } 
-    saved.previewTeams[i].slot5 = { } 
-    saved.previewTeams[i].slot6 = { } 
+    saved.previewTeams[i].slot1 = { }
+    saved.previewTeams[i].slot2 = { }
+    saved.previewTeams[i].slot3 = { }
+    saved.previewTeams[i].slot4 = { }
+    saved.previewTeams[i].slot5 = { }
+    saved.previewTeams[i].slot6 = { }
 
     saved.previewTeams[i].slot1.item = undefined
     saved.previewTeams[i].slot2.item = undefined
@@ -311,7 +311,7 @@ const observer = new MutationObserver(mutations => {
   }
 });
 
-observer.observe(document.body, { 
+observer.observe(document.body, {
   childList: true,
   subtree: true,
   attributes: true,
@@ -383,7 +383,7 @@ function learnPkmnMove(id, level, mod) {
     return undefined;
 }
 
-//used for the frontier 
+//used for the frontier
 function learnPkmnMoveSeeded(id, level, mod, seed, exclude = []) {
 
   //console.log(id)
@@ -405,7 +405,7 @@ function learnPkmnMoveSeeded(id, level, mod, seed, exclude = []) {
             return (
                 data.rarity === tier &&
                 (mod === "wild" || !knownMoves.includes(m)) &&
-                !exclude.includes(m)         
+                !exclude.includes(m)
             );
         });
 
@@ -493,7 +493,7 @@ function openTutorial(){
   if (saved.tutorialStep == "battle") document.getElementById("tutorial-text").innerHTML = `Your team will automatically attack in a set pattern, even while you tab out or close the browser! You can right click/long press on moves or pokemon to see their stats aswell. Once you have more Pokemon in your team, you will be able to switch them arround in a fight`
   if (saved.tutorialStep == "battleEnd") {document.getElementById("tutorial-text").innerHTML = `You can check a more in-depth explanation about stats and battle mechanics in the Guide menu. For now, I will take a break... Enjoy your stay!`}
   document.getElementById("tutorial").style.display = "flex"
-  
+
 }
 
 
@@ -668,3 +668,89 @@ function infoMisc(){
       {command:"saved.geneticOperation=1", effect:"Complete Genetics Operation"},
       ]);
 }
+
+// hoover preview
+(function() {
+    let debounceTimer = null;
+    let dialog = null;
+    let lastTarget = null;
+
+    function showDialog(target, pkmnId) {
+        // Remove any existing dialog
+        if (dialog) dialog.remove();
+        dialog = document.createElement('div');
+
+        const pokemon = pkmn[pkmnId];
+        let html = `<div style="font-weight: bold; margin-bottom: 8px;">Preview: ${pkmnId}</div>`;
+
+        const stats = ['hp', 'atk', 'def', 'satk', 'sdef', 'spe'];
+        stats.forEach(stat => {
+            const iv = pokemon.ivs[stat] || 0;
+            const bst = pokemon.bst[stat] || 0;
+            let stars = '';
+            for (let i = 1; i <= 6; i++) {
+                if (i <= iv && i <= bst) {
+                    stars += '<span style="color: purple;">★</span>';
+                } else if (i <= iv) {
+                    stars += '<span style="color: red;">★</span>';
+                } else if (i <= bst) {
+                    stars += '<span style="color: blue;">★</span>';
+                } else {
+                    stars += '<span>★</span>';
+                }
+            }
+            html += `<div style="margin-bottom: 4px;">${stat.toUpperCase()}: ${stars}</div>`;
+        });
+
+        dialog.innerHTML = html;
+
+        // Position near the element
+        const rect = target.getBoundingClientRect();
+        dialog.style = `
+            position: absolute;
+            background: rgba(30,30,30,0.95);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            z-index: 9999;
+            left: ${rect.right + window.scrollX + 10}px;
+            top: ${rect.top + window.scrollY}px;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+        `;
+
+        document.body.appendChild(dialog);
+    }
+
+    function hideDialog() {
+        if (dialog) {
+            dialog.remove();
+            dialog = null;
+        }
+    }
+
+    document.addEventListener('mouseenter', function(e) {
+        const element = e.target.closest('[data-pkmn-editor]');
+        if (element) {
+            lastTarget = element;
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                // Only show if still hovered
+                if (lastTarget && document.body.contains(lastTarget)) {
+                    const pkmnId = lastTarget.getAttribute('data-pkmn-editor');
+                    showDialog(lastTarget, pkmnId);
+                }
+            }, 500);
+        }
+    }, true);
+
+    document.addEventListener('mouseleave', function(e) {
+        const element = e.target.closest('[data-pkmn-editor]');
+        if (element) {
+            clearTimeout(debounceTimer);
+            hideDialog();
+            lastTarget = null;
+        }
+    }, true);
+})();
