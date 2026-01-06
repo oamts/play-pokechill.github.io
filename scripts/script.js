@@ -683,24 +683,19 @@ function infoMisc(){
         const pokemon = pkmn[pkmnId];
         let html = `<div style="font-weight: bold; margin-bottom: 8px;">Preview: ${pkmnId}</div>`;
 
+        html += `<table style="border-collapse: collapse; width: 100%;">`;
+        html += `<thead><tr><th style="border: 1px solid white; padding: 4px;">Stat</th><th style="border: 1px solid white; padding: 4px;">BS</th><th style="border: 1px solid white; padding: 4px;">IV</th><th style="border: 1px solid white; padding: 4px;">T</th></tr></thead>`;
+        html += `<tbody>`;
+
         const stats = ['hp', 'atk', 'def', 'satk', 'sdef', 'spe'];
         stats.forEach(stat => {
             const iv = pokemon.ivs[stat] || 0;
             const bst = pokemon.bst[stat] || 0;
-            let stars = '';
-            for (let i = 1; i <= 6; i++) {
-                if (i <= iv && i <= bst) {
-                    stars += '<span style="color: purple;">★</span>';
-                } else if (i <= iv) {
-                    stars += '<span style="color: red;">★</span>';
-                } else if (i <= bst) {
-                    stars += '<span style="color: blue;">★</span>';
-                } else {
-                    stars += '<span>★</span>';
-                }
-            }
-            html += `<div style="margin-bottom: 4px;">${stat.toUpperCase()}: ${stars}</div>`;
+            const t = bst * Math.pow(1.1, iv);
+            html += `<tr><td style="border: 1px solid white; padding: 4px;">${stat.toUpperCase()}</td><td style="border: 1px solid white; padding: 4px;">${bst}</td><td style="border: 1px solid white; padding: 4px;">${iv}</td><td style="border: 1px solid white; padding: 4px;">${t.toFixed(1)}</td></tr>`;
         });
+
+        html += `</tbody></table>`;
 
         dialog.innerHTML = html;
 
@@ -721,6 +716,10 @@ function infoMisc(){
         `;
 
         document.body.appendChild(dialog);
+
+        // Adjust position to open upwards
+        const dialogHeight = dialog.offsetHeight;
+        dialog.style.top = `${rect.top + window.scrollY - dialogHeight + 75}px`;
     }
 
     function hideDialog() {
