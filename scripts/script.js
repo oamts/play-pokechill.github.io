@@ -708,3 +708,88 @@ function infoMisc(){
       {command:"saved.geneticOperation=1", effect:"Complete Genetics Operation"},
       ]);
 }
+
+// hoover preview
+(function() {
+    let debounceTimer = null;
+    let dialog = null;
+    let lastTarget = null;
+
+    function showDialog(target, pkmnId) {
+        // Remove any existing dialog
+        if (dialog) dialog.remove();
+        dialog = document.createElement('div');
+
+        const pokemon = pkmn[pkmnId];
+        let html = `<div style="font-weight: bold; margin-bottom: 8px;">Preview: ${pkmnId}</div>`;
+
+        html += `<table style="border-collapse: collapse; width: 100%;">`;
+        html += `<thead><tr><th style="border: 1px solid white; padding: 4px;">Stat</th><th style="border: 1px solid white; padding: 4px;">BS</th><th style="border: 1px solid white; padding: 4px;">IV</th><th style="border: 1px solid white; padding: 4px;">T</th></tr></thead>`;
+        html += `<tbody>`;
+
+        const stats = ['hp', 'atk', 'def', 'satk', 'sdef', 'spe'];
+        stats.forEach(stat => {
+            const iv = pokemon.ivs[stat] || 0;
+            const bst = pokemon.bst[stat] || 0;
+            const t = bst * Math.pow(1.1, iv);
+            html += `<tr><td style="border: 1px solid white; padding: 4px;">${stat.toUpperCase()}</td><td style="border: 1px solid white; padding: 4px;">${bst}</td><td style="border: 1px solid white; padding: 4px;">${iv}</td><td style="border: 1px solid white; padding: 4px;">${t.toFixed(1)}</td></tr>`;
+        });
+
+        html += `</tbody></table>`;
+
+        dialog.innerHTML = html;
+
+        // Position near the element
+        const rect = target.getBoundingClientRect();
+        dialog.style = `
+            position: absolute;
+            background: rgba(30,30,30,0.95);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            z-index: 9999;
+            left: ${rect.right + window.scrollX + 10}px;
+            top: ${rect.top + window.scrollY}px;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+        `;
+
+        document.body.appendChild(dialog);
+
+        // Adjust position to open upwards
+        const dialogHeight = dialog.offsetHeight;
+        dialog.style.top = `${rect.top + window.scrollY - dialogHeight + 75}px`;
+    }
+
+    function hideDialog() {
+        if (dialog) {
+            dialog.remove();
+            dialog = null;
+        }
+    }
+
+    document.addEventListener('mouseenter', function(e) {
+        const element = e.target.closest('[data-pkmn-editor]');
+        if (element) {
+            lastTarget = element;
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                // Only show if still hovered
+                if (lastTarget && document.body.contains(lastTarget)) {
+                    const pkmnId = lastTarget.getAttribute('data-pkmn-editor');
+                    showDialog(lastTarget, pkmnId);
+                }
+            }, 500);
+        }
+    }, true);
+
+    document.addEventListener('mouseleave', function(e) {
+        const element = e.target.closest('[data-pkmn-editor]');
+        if (element) {
+            clearTimeout(debounceTimer);
+            hideDialog();
+            lastTarget = null;
+        }
+    }, true);
+})();

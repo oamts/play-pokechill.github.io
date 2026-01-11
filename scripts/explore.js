@@ -4534,6 +4534,11 @@ if (sort !== "default") {
             return a.ivs[stat] - b.ivs[stat]
         }
 
+        if (sort === "ivs") {
+            const sumIvs = (p) => (p.ivs.hp || 0) + (p.ivs.atk || 0) + (p.ivs.def || 0) + (p.ivs.satk || 0) + (p.ivs.sdef || 0) + (p.ivs.spe || 0)
+            return sumIvs(a) - sumIvs(b)
+        }
+
         return 0
     })
 }
