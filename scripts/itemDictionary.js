@@ -114,7 +114,7 @@ item.twistedSpoon = {
 
 item.eviolite = {
     type: "held",
-    info: function() {return `When held: If a Pokemon has not fully evolved, increase overall defense by x${this.power()}`},
+    info: function() {return `When held: If a Pokemon has not fully evolved, increase overall defense by x${this.power()}. This does not apply to final-stage Pokemon with a Mega-Evolution`},
     power : function() { return 1+(returnItemLevel(this.id)/5)}
 }
 
@@ -881,7 +881,11 @@ item.venusaurite = {
 
 
 
-
+item.primalEarth = {
+    type: "key",
+    rotation: 1,
+    info: function() {return `Can be used to catch event Pokemon. Expires after event finishes`},
+}
 
 
 item.thunderousRock = {
@@ -890,11 +894,8 @@ item.thunderousRock = {
     info: function() {return `Can be used to catch event Pokemon. Expires after event finishes`},
 }
 
-item.fieryRock = {
-    type: "key",
-    rotation: 1,
-    info: function() {return `Can be used to catch event Pokemon. Expires after event finishes`},
-}
+
+
 
 item.articRock = {
     type: "key",
@@ -904,13 +905,13 @@ item.articRock = {
 
 item.ancientOrchid = {
     type: "key",
-    rotation: [2,5],
+    rotation: 2,
     info: function() {return `Can be used to catch event Pokemon. Expires after event finishes`},
 }
 
 item.futureDisk = {
     type: "key",
-    rotation: [2,5],
+    rotation: 5,
     info: function() {return `Can be used to catch event Pokemon. Expires after event finishes`},
 }
 
@@ -944,6 +945,12 @@ item.wormholeResidue = {
     info: function() {return `Can be used to catch event Pokemon. Expires after event finishes`},
 }
 
+item.futureContraption = {
+    type: "key",
+    rotation: 5,
+    info: function() {return `Can be used to catch event Pokemon. Expires after event finishes`},
+}
+
 
 item.redChain = {
     type: "key",
@@ -957,22 +964,30 @@ item.wisdomPetal = {
     info: function() {return `Can be used to catch event Pokemon. Expires after event finishes`},
 }
 
-item.willpowerFeather = {
+item.epochFeather = {
     type: "key",
-    rotation: 6,
+    rotation: 1,
+    info: function() {return `Can be used to catch event Pokemon. Expires after event finishes`},
+}
+
+item.pokeflute = {
+    type: "key",
+    rotation: 1,
     info: function() {return `Can be used to catch event Pokemon. Expires after event finishes`},
 }
 
 
-
 item.mysteryEgg = {
     info: function() {return `An unhatched egg. Leave combat to discover the contents!`},
+    hidden:true
 }
 
 item.tmDummy = {
+    hidden:true
 }
 
 item.nothing = {
+    hidden:true
 }
 
 
@@ -1082,6 +1097,8 @@ item.hydroPumpTm = {}
 item.thunderTm = {}
 item.hyperBeamTm = {}
 
+item.nastyPlotTm = {}
+item.swordsDanceTm = {}
 
 
 for (const i in item){
@@ -1096,7 +1113,7 @@ for (const i in item){
         item[i].move = i.slice(0, -2); 
         item[i].type = "tm";
         
-        item[i].info = function () { return `Teach the move <span data-move="${move[item[i].move].id}" ><span  style="cursor:help;padding: 0.1rem 0.7rem; border-radius: 0.2rem; font-size:1.1rem; width: auto; background: ${returnTypeColor(move[item[i].move].type)}">${format(move[item[i].move].id)}</span></span> to a ${joinWithOr(move[item[i].move].moveset)} Pokemon`}        
+        item[i].info = function () { return `Teach the move <span data-move="${move[item[i].move].id}" ><span  style="color:white;cursor:help;padding: 0.1rem 0.7rem; border-radius: 0.2rem; font-size:1.1rem; width: auto; background: ${returnTypeColor(move[item[i].move].type)}">${format(move[item[i].move].id)}</span></span> to a ${joinWithOr(move[item[i].move].moveset)} Pokemon`}        
 
     }
 }
@@ -1104,7 +1121,7 @@ for (const i in item){
 function joinWithOr(list) {
     if (list.includes("all")) return "all";
 
-    const formatted = list.map(w => w[0].toUpperCase() + w.slice(1));
+    const formatted = list.map(x => format(x));
     const len = formatted.length;
 
     if (len === 0) return "";
@@ -1117,17 +1134,7 @@ function joinWithOr(list) {
 function joinWithAnd(list) {
     if (list.includes("all")) return "all";
 
-    const splitCamel = w =>
-        typeof w === "string"
-            ? w.replace(/([a-z])([A-Z])/g, "$1 $2")
-            : "";
-
-    const cap = w =>
-        typeof w === "string" && w.length > 0
-            ? w.charAt(0).toUpperCase() + w.slice(1)
-            : "";
-
-    const formatted = list.map(w => cap(splitCamel(w)));
+    const formatted = list.map(x => format(x));
     const len = formatted.length;
 
     if (len === 0) return "";
